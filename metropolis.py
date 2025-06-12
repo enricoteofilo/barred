@@ -33,7 +33,7 @@ def log_multivariate_gaussian(x, mean, cov):
     return -0.5*np.matmul((x-mean),np.matmul(np.linalg.inv(cov),x-mean)) -0.5*len(x)*(2*np.pi) - 0.5*np.log(np.abs(np.linalg.det(cov)))
 
 def gaussian_proposal(state, rng):
-    sigma_proposal = 2.0
+    sigma_proposal = 5.0
     if np.isscalar(state):
         return rng.normal(state,sigma_proposal)
     else:
@@ -73,6 +73,7 @@ if __name__ == "__main__":
     
     x0 = np.array([0.0])
     N_samples = 10000
+    N_trim = 1000
     
     print("x_0 is:",x0)
     
@@ -89,18 +90,20 @@ if __name__ == "__main__":
     plt.legend()
     plt.show()
     
+    trimmed_chain = chain[N_trim::]
+    
     from scipy.signal import correlate
-    autocorr = correlate(chain[:,0], chain[:,0], mode='full')/np.var(chain[:,0])
+    autocorr = correlate(trimmed_chain[:,0]-np.mean(trimmed_chain), trimmed_chain[:,0]-np.mean(trimmed_chain), mode='full')/np.var(chain[:,0])
     plt.plot(autocorr, label='Autocorrelation')
     plt.xlabel('Lag')
     plt.ylabel('Autocorrelation')
     plt.title('Autocorrelation of Metropolis Chain')
     plt.legend()
     plt.show()
-    print(f"Mean of the chain: {np.mean(chain)}")
-    print(f"Standard deviation of the chain: {np.std(chain)}")
+    print(f"Mean of the chain: {np.mean(trimmed_chain)}")
+    print(f"Standard deviation of the chain: {np.std(trimmed_chain)}")
     
-    plt.hist(chain[:,0], bins=50, density=True, alpha=0.5, label='Metropolis Samples')
+    plt.hist(trimmed_chain[:,0], bins=50, density=True, alpha=0.5, label='Metropolis Samples')
     x = np.linspace(-20, 30, 1000)
     plt.plot(x, np.exp(log_gaussian(x,mu,sigma)), label='Target Distribution', color='red')
     plt.xlabel('Value')
