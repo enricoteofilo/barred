@@ -72,7 +72,7 @@ if __name__ == "__main__":
         return log_multivariate_gaussian(x, np.array([mu]), np.asarray([[sigma**2]]))
     
     x0 = np.array([0.0])
-    N_samples = 10000
+    N_samples = 100000
     N_trim = 1000
     
     print("x_0 is:",x0)
@@ -90,11 +90,14 @@ if __name__ == "__main__":
     plt.legend()
     plt.show()
     
-    trimmed_chain = chain[N_trim::]
+    trimmed_chain = chain[N_trim::20]
     
     from scipy.signal import correlate
     autocorr = correlate(trimmed_chain[:,0]-np.mean(trimmed_chain), trimmed_chain[:,0]-np.mean(trimmed_chain), mode='full')/np.var(chain[:,0])
-    plt.plot(autocorr, label='Autocorrelation')
+    autocorr_trim_index = len(autocorr) // 2
+    trimmed_autocorr = autocorr[autocorr_trim_index:-autocorr_trim_index+50:1]
+    delay = np.arange(len(trimmed_autocorr))
+    plt.plot(delay, trimmed_autocorr, label='Autocorrelation')
     plt.xlabel('Lag')
     plt.ylabel('Autocorrelation')
     plt.title('Autocorrelation of Metropolis Chain')
