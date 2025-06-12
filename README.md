@@ -1,2 +1,2 @@
 # barred
-Quick and dirty implementations of montecarlo algorithms in Python
+Quick and dirty implementations of MonteCarlo algorithms in Python
